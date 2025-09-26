@@ -2,6 +2,7 @@ import type React from "react";
 import "./index.css";
 import { useState } from "react";
 import type { ImageRecognitionResponse } from "../../models/Image";
+import Swal from "sweetalert2";
 
 function ImageForm() {
   const [invert, setinvert] = useState<boolean>(false);
@@ -25,27 +26,45 @@ function ImageForm() {
     e.preventDefault();
     setLoading(true);
     if (!image) {
-      alert("Debes subir una imagen para el reconocimiento");
+      Swal.fire({
+        title: "¡Error!",
+        text: "Debes subir una imagen para el reconocimiento",
+        icon: "error",
+        confirmButtonText: "De acuerdo",
+      });
       setLoading(false);
       return;
     }
-    const fromData = new FormData();
-    fromData.append("invert", `${invert}`);
-    fromData.append("image", image!);
 
-    fetch("http://ec2-54-81-142-28.compute-1.amazonaws.com:8080/predict", {
-      method: "POST",
-      body: fromData,
-    })
-      .then((response) => {
-        if (!response.ok) {
-          alert(`Error: ${response.status}`);
-        }
-        return response.json() as unknown as ImageRecognitionResponse;
-      })
-      .then((imageResponse) => setImageResponse(imageResponse))
-      .catch((error) => alert(`Error: ${error}`))
-      .finally(() => setLoading(false));
+    Swal.fire({
+      title: "Confirmar operacion",
+      text: "¿Desea reconocer esta imagen?",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Si",
+      cancelButtonText: "No",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        const fromData = new FormData();
+        fromData.append("invert", `${invert}`);
+        fromData.append("image", image!);
+
+        fetch("http://ec2-54-81-142-28.compute-1.amazonaws.com:8080/predict", {
+          method: "POST",
+          body: fromData,
+        })
+          .then((response) => {
+            if (!response.ok) {
+              alert(`Error: ${response.status}`);
+            }
+            return response.json() as unknown as ImageRecognitionResponse;
+          })
+          .then((imageResponse) => setImageResponse(imageResponse))
+          .catch((error) => alert(`Error: ${error}`))
+          .finally(() => setLoading(false));
+      }
+      setLoading(false);
+    });
   };
 
   return (
