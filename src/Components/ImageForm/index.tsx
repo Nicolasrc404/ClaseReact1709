@@ -49,7 +49,7 @@ function ImageForm() {
         fromData.append("invert", `${invert}`);
         fromData.append("image", image!);
 
-        fetch("http://ec2-54-81-142-28.compute-1.amazonaws.com:8080/predict", {
+        fetch("/api/predict", {
           method: "POST",
           body: fromData,
         })
