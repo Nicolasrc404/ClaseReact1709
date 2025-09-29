@@ -6,7 +6,7 @@ function App() {
   return (
     <>
       <Routes>
-        <Route path="/image" element={<ImageForm />} />
+        <Route path="/" element={<ImageForm />} />
       </Routes>
     </>
   );
